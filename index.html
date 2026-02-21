@@ -3,204 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tic Tac Toe</title>
+<title>Super Tic Tac Toe</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #0e0e12;
-    --surface: #16161d;
-    --border: #2a2a38;
-    --accent: #e8ff47;
-    --accent2: #ff4f7b;
-    --text: #f0f0f5;
-    --muted: #6b6b80;
-    --cell-size: 110px;
-  }
+:root {
+  --bg: #0e0e12;
+  --surface: #16161d;
+  --surface2: #1e1e28;
+  --border: #2a2a38;
+  --accent: #e8ff47;
+  --accent2: #ff4f7b;
+  --text: #f0f0f5;
+  --muted: #6b6b80;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
 
-  h1 {
-    font-size: clamp(2.5rem, 8vw, 5rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 0.2em;
-    background: linear-gradient(135deg, var(--accent) 0%, #fff 60%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+h1 {
+  font-size: clamp(2rem, 7vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.15em;
+  background: linear-gradient(135deg, var(--accent) 0%, #fff 65%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
 
-  .tagline {
-    color: var(--muted);
-    font-family: 'Syne Mono', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 3rem;
-  }
+.tagline {
+  color: var(--muted);
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
 
-  .screen { display: none; flex-direction: column; align-items: center; gap: 1rem; animation: fadeIn 0.3s ease; }
-  .screen.active { display: flex; }
+.screen { display: none; flex-direction: column; align-items: center; gap: 1rem; animation: fadeIn 0.25s ease; }
+.screen.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.btn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 2rem;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.13s ease;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+.btn.primary { background: var(--accent); color: #0e0e12; border-color: var(--accent); }
+.btn.primary:hover { background: #d4eb3a; border-color: #d4eb3a; color: #0e0e12; }
+.btn.danger:hover { border-color: var(--accent2); color: var(--accent2); }
 
-  .btn {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: 0.05em;
-    padding: 0.9rem 2.5rem;
-    border: 2px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.15s ease;
-    width: 100%;
-    max-width: 300px;
-    text-align: center;
-  }
-  .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
-  .btn.primary { background: var(--accent); color: #0e0e12; border-color: var(--accent); }
-  .btn.primary:hover { background: #d4eb3a; border-color: #d4eb3a; color: #0e0e12; transform: translateY(-1px); }
-  .btn.danger:hover { border-color: var(--accent2); color: var(--accent2); }
+.input-group { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 300px; }
+input[type="text"] {
+  font-family: 'Syne Mono', monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.8rem 1rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.13s;
+}
+input[type="text"]:focus { border-color: var(--accent); }
 
-  .input-group { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 300px; }
-  input[type="text"] {
-    font-family: 'Syne Mono', monospace;
-    font-size: 1.4rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    text-align: center;
-    padding: 0.8rem 1rem;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    color: var(--text);
-    border-radius: 4px;
-    outline: none;
-    width: 100%;
-    transition: border-color 0.15s;
-  }
-  input[type="text"]:focus { border-color: var(--accent); }
+.label {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+.sep { width: 100%; max-width: 300px; height: 1px; background: var(--border); margin: 0.25rem 0; }
+.error-msg { font-family: 'Syne Mono', monospace; font-size: 0.8rem; color: var(--accent2); text-align: center; min-height: 1.2em; }
 
-  .board {
-    display: grid;
-    grid-template-columns: repeat(3, var(--cell-size));
-    grid-template-rows: repeat(3, var(--cell-size));
-    gap: 8px;
-    margin: 1.5rem 0;
-  }
+.code-display {
+  font-family: 'Syne Mono', monospace;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: var(--accent);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  text-align: center;
+}
 
-  .cell {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
-  }
-  .cell:hover:not(.taken) { border-color: var(--accent); background: #1e1e28; }
-  .cell.taken { cursor: default; }
-  .cell.x { color: var(--accent); }
-  .cell.o { color: var(--accent2); }
-  .cell.win { border-color: var(--accent); background: rgba(232,255,71,0.08); }
-  .cell.win.o { border-color: var(--accent2); background: rgba(255,79,123,0.08); }
+.spinner {
+  width: 26px; height: 26px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  .status {
-    font-family: 'Syne Mono', monospace;
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    text-align: center;
-    min-height: 2.5em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .status .highlight { color: var(--accent); font-weight: 700; }
-  .status .highlight.o { color: var(--accent2); }
+/* ── Game UI ── */
+.game-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; }
 
-  .code-display {
-    font-family: 'Syne Mono', monospace;
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: 0.4em;
-    color: var(--accent);
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 6px;
-    padding: 1rem 2rem;
-    text-align: center;
-  }
+.badges { display: flex; gap: 0.5rem; }
+.player-badge {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.player-badge.active-x { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px rgba(232,255,71,0.2); }
+.player-badge.active-o { border-color: var(--accent2); color: var(--accent2); box-shadow: 0 0 12px rgba(255,79,123,0.2); }
 
-  .label {
-    font-family: 'Syne Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-  }
+.status {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-align: center;
+  min-height: 2.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.status .hx { color: var(--accent); font-weight: 700; }
+.status .ho { color: var(--accent2); font-weight: 700; }
 
-  .sep { width: 100%; max-width: 300px; height: 1px; background: var(--border); margin: 0.5rem 0; }
+.btn-row { display: flex; gap: 0.6rem; }
+.btn-row .btn { max-width: 160px; font-size: 0.9rem; padding: 0.7rem 1rem; }
 
-  .error-msg {
-    font-family: 'Syne Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--accent2);
-    text-align: center;
-    min-height: 1.2em;
-  }
+/* ── Super Board ── */
+.super-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  /* sizing handled by JS / CSS custom prop */
+  --sb-size: min(90vw, 520px);
+  width: var(--sb-size);
+  height: var(--sb-size);
+}
 
-  .player-badge {
-    font-family: 'Syne Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-  .player-badge.active-x { border-color: var(--accent); color: var(--accent); }
-  .player-badge.active-o { border-color: var(--accent2); color: var(--accent2); }
+.mini-board-wrap {
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+}
 
-  .btn-row { display: flex; gap: 0.75rem; width: 100%; max-width: 300px; }
-  .btn-row .btn { max-width: none; }
+/* Active target board */
+.mini-board-wrap.target {
+  border-color: rgba(232,255,71,0.5);
+  background: rgba(232,255,71,0.04);
+  box-shadow: 0 0 16px rgba(232,255,71,0.1);
+}
 
-  .spinner {
-    width: 28px; height: 28px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Mini grid inside */
+.mini-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+.mini-cell {
+  border-radius: 3px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  font-size: clamp(0.5rem, 2vw, 1.1rem);
+  color: transparent;
+  user-select: none;
+}
+.mini-cell.x { color: var(--accent); }
+.mini-cell.o { color: var(--accent2); }
+.mini-cell:hover:not(.taken):not(.locked) { background: #2a2a3a; }
+.mini-cell.taken, .mini-cell.locked { cursor: default; }
+
+/* Won mini-board overlay */
+.mini-won-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 6vw, 3.5rem);
+  pointer-events: none;
+  border-radius: 4px;
+  backdrop-filter: blur(1px);
+}
+.mini-won-overlay.x {
+  background: rgba(232,255,71,0.12);
+  color: var(--accent);
+  text-shadow: 0 0 30px rgba(232,255,71,0.6);
+}
+.mini-won-overlay.o {
+  background: rgba(255,79,123,0.12);
+  color: var(--accent2);
+  text-shadow: 0 0 30px rgba(255,79,123,0.6);
+}
+.mini-won-overlay.draw {
+  background: rgba(107,107,128,0.15);
+  color: var(--muted);
+  font-size: clamp(1rem, 4vw, 2rem);
+  letter-spacing: 0.1em;
+  font-family: 'Syne Mono', monospace;
+}
+
+/* Winning mini-boards in big game */
+.mini-board-wrap.big-win-x { border-color: var(--accent) !important; box-shadow: 0 0 20px rgba(232,255,71,0.25); }
+.mini-board-wrap.big-win-o { border-color: var(--accent2) !important; box-shadow: 0 0 20px rgba(255,79,123,0.25); }
 </style>
 </head>
 <body>
 
-<h1>TIC TAC TOE</h1>
-<p class="tagline">Two players. One winner.</p>
+<h1>SUPER<br>TIC TAC TOE</h1>
+<p class="tagline">Nine boards. One champion.</p>
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
@@ -233,97 +293,233 @@
 
 <!-- LOCAL GAME -->
 <div class="screen" id="screen-local-game">
-  <div style="display:flex;gap:0.5rem">
-    <span class="player-badge" id="local-badge-x">✕ Player 1</span>
-    <span class="player-badge" id="local-badge-o">○ Player 2</span>
-  </div>
-  <div class="board" id="local-board"></div>
-  <div class="status" id="local-status"></div>
-  <div class="btn-row">
-    <button class="btn" onclick="startLocalGame()">New Game</button>
-    <button class="btn danger" onclick="go('screen-home')">← Menu</button>
+  <div class="game-wrap">
+    <div class="badges">
+      <span class="player-badge" id="local-badge-x">✕ Player 1</span>
+      <span class="player-badge" id="local-badge-o">○ Player 2</span>
+    </div>
+    <div class="super-board" id="local-super-board"></div>
+    <div class="status" id="local-status"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="startLocalGame()">New Game</button>
+      <button class="btn danger" onclick="go('screen-home')">← Menu</button>
+    </div>
   </div>
 </div>
 
 <!-- ONLINE GAME -->
 <div class="screen" id="screen-online-game">
-  <div style="display:flex;gap:0.5rem">
-    <span class="player-badge" id="online-badge-x">✕ You</span>
-    <span class="player-badge" id="online-badge-o">○ Opponent</span>
+  <div class="game-wrap">
+    <div class="badges">
+      <span class="player-badge" id="online-badge-x">✕ You</span>
+      <span class="player-badge" id="online-badge-o">○ Opponent</span>
+    </div>
+    <div class="super-board" id="online-super-board"></div>
+    <div class="status" id="online-status"></div>
+    <div class="btn-row" id="online-btn-row" style="display:none">
+      <button class="btn primary" onclick="requestRematch()">Play Again</button>
+      <button class="btn danger" onclick="leaveOnline(); go('screen-home')">Leave</button>
+    </div>
+    <button class="btn danger" id="online-leave-btn" onclick="leaveOnline(); go('screen-home')">← Leave Game</button>
   </div>
-  <div class="board" id="online-board"></div>
-  <div class="status" id="online-status"></div>
-  <div class="btn-row" id="online-btn-row" style="display:none">
-    <button class="btn" onclick="requestRematch()">Play Again</button>
-    <button class="btn danger" onclick="leaveOnline(); go('screen-home')">Leave</button>
-  </div>
-  <button class="btn danger" id="online-leave-btn" onclick="leaveOnline(); go('screen-home')">← Leave Game</button>
 </div>
 
 <script>
-// ─── Screen Router ────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  SCREEN ROUTER
+// ══════════════════════════════════════════════════════
 function go(id, cb) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (cb) cb();
 }
 
-// ─── LOCAL GAME ───────────────────────────────────────────────────
-let localBoard, localTurn, localOver;
+// ══════════════════════════════════════════════════════
+//  SHARED GAME LOGIC
+// ══════════════════════════════════════════════════════
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-function startLocalGame() {
-  localBoard = Array(9).fill(null);
-  localTurn = 0;
-  localOver = false;
-  renderLocalBoard();
-  updateLocalStatus();
+function checkMiniWinner(cells) {
+  for (const [a,b,c] of WINS) {
+    if (cells[a] !== null && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];
+  }
+  if (cells.every(c => c !== null)) return 'draw';
+  return null;
 }
 
-function renderLocalBoard() {
-  const el = document.getElementById('local-board');
-  el.innerHTML = '';
-  localBoard.forEach((v, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'cell' + (v !== null ? ' taken' : '') + (v === 0 ? ' x' : v === 1 ? ' o' : '');
-    cell.textContent = v === 0 ? '✕' : v === 1 ? '○' : '';
-    cell.onclick = () => localMove(i);
-    el.appendChild(cell);
-  });
-  // highlight wins
-  const w = winCells(localBoard);
-  if (w) w.forEach(i => el.children[i].classList.add('win'));
+function checkBigWinner(miniWinner) {
+  for (const [a,b,c] of WINS) {
+    if (miniWinner[a] !== null && miniWinner[a] !== 'draw' &&
+        miniWinner[a] === miniWinner[b] && miniWinner[a] === miniWinner[c]) return miniWinner[a];
+  }
+  if (miniWinner.every(m => m !== null)) return 'draw';
+  return null;
 }
 
-function localMove(i) {
-  if (localOver || localBoard[i] !== null) return;
-  localBoard[i] = localTurn;
-  const w = winCells(localBoard);
-  const draw = !w && localBoard.every(c => c !== null);
-  if (w || draw) localOver = true;
-  else localTurn = 1 - localTurn;
-  renderLocalBoard();
-  updateLocalStatus(w, draw);
+function freshGame() {
+  return {
+    cells: Array.from({ length: 9 }, () => Array(9).fill(null)),
+    miniWinner: Array(9).fill(null),
+    gameWinner: null,
+    turn: 0,
+    activeBoard: null
+  };
 }
 
-function updateLocalStatus(w, draw) {
-  const s = document.getElementById('local-status');
-  const bx = document.getElementById('local-badge-x');
-  const bo = document.getElementById('local-badge-o');
-  bx.className = 'player-badge' + (localTurn === 0 && !localOver ? ' active-x' : '');
-  bo.className = 'player-badge' + (localTurn === 1 && !localOver ? ' active-o' : '');
-  if (w) {
-    const who = localBoard[w[0]] === 0;
-    s.innerHTML = `<span class="highlight${who ? '' : ' o'}">${who ? 'Player 1 wins!' : 'Player 2 wins!'}</span>`;
-  } else if (draw) {
-    s.innerHTML = `It's a draw!`;
-  } else {
-    s.innerHTML = `<span class="highlight${localTurn ? ' o' : ''}">${localTurn === 0 ? 'Player 1' : 'Player 2'}</span>'s turn`;
+// Apply a move locally (returns false if invalid)
+function applyMove(game, bi, ci) {
+  if (game.gameWinner) return false;
+  if (game.miniWinner[bi] !== null) return false;
+  if (game.cells[bi][ci] !== null) return false;
+  if (game.activeBoard !== null && game.activeBoard !== bi) return false;
+
+  game.cells[bi][ci] = game.turn;
+
+  const mw = checkMiniWinner(game.cells[bi]);
+  if (mw !== null) game.miniWinner[bi] = mw;
+
+  const gw = checkBigWinner(game.miniWinner);
+  if (gw !== null) {
+    game.gameWinner = gw;
+  }
+
+  if (!game.gameWinner) {
+    game.activeBoard = (game.miniWinner[ci] !== null) ? null : ci;
+    game.turn = 1 - game.turn;
+  }
+  return true;
+}
+
+// ══════════════════════════════════════════════════════
+//  BOARD RENDERER
+// ══════════════════════════════════════════════════════
+function renderSuperBoard(boardEl, game, onCellClick) {
+  boardEl.innerHTML = '';
+
+  for (let bi = 0; bi < 9; bi++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'mini-board-wrap';
+
+    const mw = game.miniWinner[bi];
+    const isTarget = !game.gameWinner && mw === null &&
+                     (game.activeBoard === null || game.activeBoard === bi);
+
+    if (isTarget) wrap.classList.add('target');
+
+    // Big-win highlight for boards in a winning line
+    if (mw !== null && mw !== 'draw') {
+      const bigWin = checkBigWinner(game.miniWinner);
+      if (bigWin !== null && bigWin !== 'draw') {
+        // highlight boards that are part of the winning line
+        for (const [a,b,c] of WINS) {
+          if (game.miniWinner[a] === bigWin && game.miniWinner[b] === bigWin && game.miniWinner[c] === bigWin) {
+            if (bi === a || bi === b || bi === c) {
+              wrap.classList.add(bigWin === 0 ? 'big-win-x' : 'big-win-o');
+            }
+          }
+        }
+      }
+    }
+
+    // Mini grid
+    const miniEl = document.createElement('div');
+    miniEl.className = 'mini-board';
+
+    for (let ci = 0; ci < 9; ci++) {
+      const cell = document.createElement('div');
+      const val = game.cells[bi][ci];
+      cell.className = 'mini-cell';
+      if (val === 0) { cell.classList.add('x', 'taken'); cell.textContent = '✕'; }
+      else if (val === 1) { cell.classList.add('o', 'taken'); cell.textContent = '○'; }
+      else if (mw !== null) { cell.classList.add('locked'); }
+
+      if (val === null && mw === null) {
+        cell.onclick = () => onCellClick(bi, ci);
+      }
+
+      miniEl.appendChild(cell);
+    }
+
+    wrap.appendChild(miniEl);
+
+    // Won overlay
+    if (mw !== null) {
+      const ov = document.createElement('div');
+      ov.className = 'mini-won-overlay';
+      if (mw === 0) { ov.classList.add('x'); ov.textContent = '✕'; }
+      else if (mw === 1) { ov.classList.add('o'); ov.textContent = '○'; }
+      else { ov.classList.add('draw'); ov.textContent = 'DRAW'; }
+      wrap.appendChild(ov);
+    }
+
+    boardEl.appendChild(wrap);
   }
 }
 
-// ─── ONLINE GAME ──────────────────────────────────────────────────
-let ws, myIndex, onlineBoard, onlineTurn, onlineOver;
+// ══════════════════════════════════════════════════════
+//  STATUS HELPERS
+// ══════════════════════════════════════════════════════
+function gameStatusHTML(game, myIndex /* undefined for local */) {
+  const isLocal = myIndex === undefined;
 
+  if (game.gameWinner === 'draw') return "It's a draw!";
+
+  if (game.gameWinner !== null) {
+    const winner = game.gameWinner;
+    if (isLocal) {
+      const who = winner === 0 ? 'Player 1' : 'Player 2';
+      return `<span class="${winner === 0 ? 'hx' : 'ho'}">${who} wins! 🎉</span>`;
+    } else {
+      const iWon = winner === myIndex;
+      return `<span class="${winner === 0 ? 'hx' : 'ho'}">${iWon ? 'You win! 🎉' : 'Opponent wins.'}</span>`;
+    }
+  }
+
+  // Game ongoing
+  const isFree = game.activeBoard === null;
+  const turnLabel = game.turn === 0
+    ? `<span class="hx">${isLocal ? 'Player 1' : (game.turn === myIndex ? 'You' : 'Opponent')}</span>`
+    : `<span class="ho">${isLocal ? 'Player 2' : (game.turn === myIndex ? 'You' : 'Opponent')}</span>`;
+
+  const suffix = isFree ? ' — pick any board' : '';
+  return `${turnLabel}'s turn${suffix}`;
+}
+
+function updateBadges(xEl, oEl, game) {
+  const over = game.gameWinner !== null;
+  xEl.className = 'player-badge' + (!over && game.turn === 0 ? ' active-x' : '');
+  oEl.className = 'player-badge' + (!over && game.turn === 1 ? ' active-o' : '');
+}
+
+// ══════════════════════════════════════════════════════
+//  LOCAL GAME
+// ══════════════════════════════════════════════════════
+let localGame;
+
+function startLocalGame() {
+  localGame = freshGame();
+  renderLocal();
+}
+
+function renderLocal() {
+  const boardEl = document.getElementById('local-super-board');
+  renderSuperBoard(boardEl, localGame, (bi, ci) => {
+    if (localGame.gameWinner) return;
+    applyMove(localGame, bi, ci);
+    renderLocal();
+  });
+  document.getElementById('local-status').innerHTML = gameStatusHTML(localGame);
+  updateBadges(
+    document.getElementById('local-badge-x'),
+    document.getElementById('local-badge-o'),
+    localGame
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  ONLINE GAME
+// ══════════════════════════════════════════════════════
+let ws, myIndex, onlineGame, onlineOver;
 const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
 
 function connectWS() {
@@ -333,10 +529,10 @@ function connectWS() {
     ws.onerror = reject;
     ws.onmessage = (e) => handleMsg(JSON.parse(e.data));
     ws.onclose = () => {
-      if (!onlineOver) setOnlineStatus('Connection lost. <span style="color:var(--accent2)">Opponent disconnected.</span>');
+      if (!onlineOver) setOnlineStatus('Connection lost. <span class="ho">Opponent disconnected.</span>');
+      onlineOver = true;
       document.getElementById('online-btn-row').style.display = 'flex';
       document.getElementById('online-leave-btn').style.display = 'none';
-      onlineOver = true;
     };
   });
 }
@@ -372,7 +568,6 @@ function handleMsg(msg) {
   else if (msg.type === 'joined') {
     myIndex = 1;
     go('screen-online-game');
-    initOnlineGame();
     setOnlineStatus('Waiting for game to start…');
   }
   else if (msg.type === 'error') {
@@ -380,41 +575,33 @@ function handleMsg(msg) {
     if (ws) { ws.onclose = null; ws.close(); ws = null; }
   }
   else if (msg.type === 'start') {
-    go('screen-online-game');
-    onlineBoard = msg.board;
-    onlineTurn = msg.turn;
+    onlineGame = msg.game;
     onlineOver = false;
-    initOnlineGame();
-    renderOnlineBoard();
-    updateOnlineStatus();
+    go('screen-online-game');
+    initOnlineUI();
+    renderOnline();
   }
   else if (msg.type === 'update') {
-    onlineBoard = msg.board;
-    onlineTurn = msg.turn;
-    const w = winCells(onlineBoard);
-    const draw = msg.draw;
-    if (msg.winner !== null && msg.winner !== undefined) onlineOver = true;
-    if (draw) onlineOver = true;
-    renderOnlineBoard();
-    updateOnlineStatus(msg.winner !== null && msg.winner !== undefined ? winCells(onlineBoard) : null, draw, msg.winner);
-    if (onlineOver) {
+    onlineGame = msg.game;
+    renderOnline();
+    if (onlineGame.gameWinner !== null) {
+      onlineOver = true;
       document.getElementById('online-btn-row').style.display = 'flex';
       document.getElementById('online-leave-btn').style.display = 'none';
     }
   }
   else if (msg.type === 'rematch_waiting') {
-    setOnlineStatus('Waiting for opponent to agree…');
+    setOnlineStatus('Waiting for opponent…');
   }
   else if (msg.type === 'opponent_left') {
-    setOnlineStatus('<span style="color:var(--accent2)">Opponent left the game.</span>');
+    setOnlineStatus('<span class="ho">Opponent left the game.</span>');
     onlineOver = true;
     document.getElementById('online-btn-row').style.display = 'none';
     document.getElementById('online-leave-btn').style.display = 'block';
   }
 }
 
-function initOnlineGame() {
-  onlineOver = false;
+function initOnlineUI() {
   document.getElementById('online-btn-row').style.display = 'none';
   document.getElementById('online-leave-btn').style.display = 'block';
   const bx = document.getElementById('online-badge-x');
@@ -423,45 +610,19 @@ function initOnlineGame() {
   else { bx.textContent = '✕ Opponent'; bo.textContent = '○ You'; }
 }
 
-function renderOnlineBoard() {
-  const el = document.getElementById('online-board');
-  el.innerHTML = '';
-  onlineBoard.forEach((v, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'cell' + (v !== null ? ' taken' : '') + (v === 0 ? ' x' : v === 1 ? ' o' : '');
-    cell.textContent = v === 0 ? '✕' : v === 1 ? '○' : '';
-    cell.onclick = () => onlineMove(i);
-    el.appendChild(cell);
+function renderOnline() {
+  const boardEl = document.getElementById('online-super-board');
+  renderSuperBoard(boardEl, onlineGame, (bi, ci) => {
+    if (onlineOver || onlineGame.gameWinner !== null) return;
+    if (onlineGame.turn !== myIndex) return;
+    ws.send(JSON.stringify({ type: 'move', bi, ci }));
   });
-  const w = winCells(onlineBoard);
-  if (w) {
-    w.forEach(i => {
-      el.children[i].classList.add('win');
-      if (onlineBoard[i] === 1) el.children[i].classList.add('o');
-    });
-  }
-}
-
-function onlineMove(i) {
-  if (onlineOver || onlineBoard[i] !== null || onlineTurn !== myIndex) return;
-  ws.send(JSON.stringify({ type: 'move', index: i }));
-}
-
-function updateOnlineStatus(w, draw, winner) {
-  const bx = document.getElementById('online-badge-x');
-  const bo = document.getElementById('online-badge-o');
-  bx.className = 'player-badge' + (onlineTurn === 0 && !onlineOver ? ' active-x' : '');
-  bo.className = 'player-badge' + (onlineTurn === 1 && !onlineOver ? ' active-o' : '');
-
-  if (w && winner !== undefined && winner !== null) {
-    const iWon = winner === myIndex;
-    setOnlineStatus(`<span class="highlight${winner === 1 ? ' o' : ''}">${iWon ? 'You win! 🎉' : 'Opponent wins.'}</span>`);
-  } else if (draw) {
-    setOnlineStatus("It's a draw!");
-  } else {
-    const myTurn = onlineTurn === myIndex;
-    setOnlineStatus(`<span class="highlight${onlineTurn === 1 ? ' o' : ''}">${myTurn ? 'Your turn' : "Opponent's turn"}</span>`);
-  }
+  setOnlineStatus(gameStatusHTML(onlineGame, myIndex));
+  updateBadges(
+    document.getElementById('online-badge-x'),
+    document.getElementById('online-badge-o'),
+    onlineGame
+  );
 }
 
 function setOnlineStatus(html) {
@@ -476,16 +637,7 @@ function requestRematch() {
   }
 }
 
-// ─── Win Logic ────────────────────────────────────────────────────
-const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-function winCells(board) {
-  for (const [a,b,c] of WINS) {
-    if (board[a] !== null && board[a] === board[b] && board[a] === board[c]) return [a,b,c];
-  }
-  return null;
-}
-
-// Init local board on page load
+// Init
 startLocalGame();
 </script>
 </body>
