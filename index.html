@@ -299,7 +299,7 @@ input[type="text"]:focus { border-color: var(--accent); }
   <div class="sep"></div>
   <div class="input-group">
     <div class="label">Join with code</div>
-    <input type="text" id="join-code-input" maxlength="5" placeholder="XXXXX" oninput="this.value=this.value.toUpperCase()" />
+    <input type="text" id="join-code-input" maxlength="4" placeholder="0000" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" inputmode="numeric" />
     <div class="error-msg" id="join-error"></div>
     <button class="btn" onclick="joinRoom()">Join Room</button>
   </div>
@@ -548,7 +548,7 @@ function renderLocal() {
 // ══════════════════════════════════════════════════════
 //  ONLINE GAME
 // ══════════════════════════════════════════════════════
-let ws, myIndex, onlineGame, onlineOver;
+let ws, myIndex, onlineGame, onlineOver, currentRoomCode;
 const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
 
 function connectWS() {
@@ -574,9 +574,9 @@ async function createRoom() {
 }
 
 async function joinRoom() {
-  const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+  const code = document.getElementById('join-code-input').value.trim();
   document.getElementById('join-error').textContent = '';
-  if (code.length !== 5) { document.getElementById('join-error').textContent = 'Enter a 5-character code.'; return; }
+  if (!/^[0-9]{4}$/.test(code)) { document.getElementById('join-error').textContent = 'Enter a 4-digit code.'; return; }
   try {
     await connectWS();
     ws.send(JSON.stringify({ type: 'join', code }));
@@ -591,11 +591,13 @@ function leaveOnline() {
 function handleMsg(msg) {
   if (msg.type === 'created') {
     myIndex = 0;
+    currentRoomCode = msg.code;
     document.getElementById('waiting-code').textContent = msg.code;
     go('screen-waiting');
   }
   else if (msg.type === 'joined') {
-    myIndex = 1;
+    myIndex = msg.playerIndex;
+    currentRoomCode = msg.code;
     go('screen-online-game');
     setOnlineStatus('Waiting for game to start…');
   }
@@ -623,8 +625,10 @@ function handleMsg(msg) {
     setOnlineStatus('Waiting for opponent…');
   }
   else if (msg.type === 'opponent_left') {
-    setOnlineStatus('<span class="ho">Opponent left the game.</span>');
-    onlineOver = true;
+    // Game is paused, room held for 5 min — show the room code so someone can rejoin
+    const code = ws && ws._code ? ws._code : '';
+    setOnlineStatus('Opponent disconnected. Room held for 5 min — share code <span class="hx">' + currentRoomCode + '</span> to let them rejoin.');
+    // Don't set onlineOver — game can resume
     document.getElementById('online-btn-row').style.display = 'none';
     document.getElementById('online-leave-btn').style.display = 'block';
   }
