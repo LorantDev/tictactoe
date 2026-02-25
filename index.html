@@ -185,12 +185,37 @@ input[type="text"]:focus { border-color: var(--accent); }
   transition: border-color 0.2s, background 0.2s;
 }
 
-/* Active target board */
-.mini-board-wrap.target {
-  border-color: rgba(232,255,71,0.5);
+/* Active target board — color matches whose turn it is */
+.mini-board-wrap.target-x {
+  border-color: rgba(232,255,71,0.55);
   background: rgba(232,255,71,0.04);
-  box-shadow: 0 0 16px rgba(232,255,71,0.1);
+  box-shadow: 0 0 16px rgba(232,255,71,0.12);
 }
+.mini-board-wrap.target-o {
+  border-color: rgba(255,79,123,0.55);
+  background: rgba(255,79,123,0.04);
+  box-shadow: 0 0 16px rgba(255,79,123,0.12);
+}
+
+/* "You are" indicator for online game */
+.you-are {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.you-are .symbol { font-size: 1.1rem; font-weight: 800; line-height: 1; }
+.you-are.is-x { border-color: rgba(232,255,71,0.4); color: var(--text); }
+.you-are.is-x .symbol { color: var(--accent); }
+.you-are.is-o { border-color: rgba(255,79,123,0.4); color: var(--text); }
+.you-are.is-o .symbol { color: var(--accent2); }
 
 /* Mini grid inside */
 .mini-board {
@@ -260,7 +285,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 <body>
 
 <h1>SUPER<br>TIC TAC TOE</h1>
-<p class="tagline">Az eletem ertelme ez a jatek</p>
+<p class="tagline">Nine boards. One champion.</p>
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
@@ -313,6 +338,10 @@ input[type="text"]:focus { border-color: var(--accent); }
     <div class="badges">
       <span class="player-badge" id="online-badge-x">✕ You</span>
       <span class="player-badge" id="online-badge-o">○ Opponent</span>
+    </div>
+    <div class="you-are" id="online-you-are">
+      <span>You are</span>
+      <span class="symbol" id="online-you-symbol">✕</span>
     </div>
     <div class="super-board" id="online-super-board"></div>
     <div class="status" id="online-status"></div>
@@ -404,7 +433,7 @@ function renderSuperBoard(boardEl, game, onCellClick) {
     const isTarget = !game.gameWinner && mw === null &&
                      (game.activeBoard === null || game.activeBoard === bi);
 
-    if (isTarget) wrap.classList.add('target');
+    if (isTarget) wrap.classList.add(game.turn === 0 ? 'target-x' : 'target-o');
 
     // Big-win highlight for boards in a winning line
     if (mw !== null && mw !== 'draw') {
@@ -608,6 +637,16 @@ function initOnlineUI() {
   const bo = document.getElementById('online-badge-o');
   if (myIndex === 0) { bx.textContent = '✕ You'; bo.textContent = '○ Opponent'; }
   else { bx.textContent = '✕ Opponent'; bo.textContent = '○ You'; }
+  // Set "You are" indicator
+  const youAre = document.getElementById('online-you-are');
+  const youSym = document.getElementById('online-you-symbol');
+  if (myIndex === 0) {
+    youAre.className = 'you-are is-x';
+    youSym.textContent = '✕';
+  } else {
+    youAre.className = 'you-are is-o';
+    youSym.textContent = '○';
+  }
 }
 
 function renderOnline() {
