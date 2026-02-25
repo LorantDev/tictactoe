@@ -130,6 +130,37 @@ input[type="text"]:focus { border-color: var(--accent); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Difficulty picker ── */
+.diff-buttons { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; align-items: center; }
+.diff-btn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 2rem;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.13s ease;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.diff-btn .diff-label { }
+.diff-btn .diff-desc { font-size: 0.72rem; font-family: 'Syne Mono', monospace; color: var(--muted); letter-spacing: 0.05em; }
+.diff-btn:hover { transform: translateY(-1px); }
+.diff-btn.easy:hover  { border-color: #47ff8a; color: #47ff8a; }
+.diff-btn.easy:hover .diff-desc { color: #47ff8a; opacity: 0.7; }
+.diff-btn.medium:hover { border-color: var(--accent); color: var(--accent); }
+.diff-btn.medium:hover .diff-desc { color: var(--accent); opacity: 0.7; }
+.diff-btn.hard:hover  { border-color: var(--accent2); color: var(--accent2); }
+.diff-btn.hard:hover .diff-desc { color: var(--accent2); opacity: 0.7; }
+
 /* ── Game UI ── */
 .game-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; }
 
@@ -164,13 +195,25 @@ input[type="text"]:focus { border-color: var(--accent); }
 .btn-row { display: flex; gap: 0.6rem; }
 .btn-row .btn { max-width: 160px; font-size: 0.9rem; padding: 0.7rem 1rem; }
 
+/* thinking dot animation */
+.thinking::after {
+  content: '';
+  display: inline-block;
+  animation: dots 1.2s steps(3, end) infinite;
+}
+@keyframes dots {
+  0%   { content: ''; }
+  33%  { content: '.'; }
+  66%  { content: '..'; }
+  100% { content: '...'; }
+}
+
 /* ── Super Board ── */
 .super-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 6px;
-  /* sizing handled by JS / CSS custom prop */
   --sb-size: min(90vw, 520px);
   width: var(--sb-size);
   height: var(--sb-size);
@@ -185,7 +228,6 @@ input[type="text"]:focus { border-color: var(--accent); }
   transition: border-color 0.2s, background 0.2s;
 }
 
-/* Active target board — color matches whose turn it is */
 .mini-board-wrap.target-x {
   border-color: rgba(232,255,71,0.55);
   background: rgba(232,255,71,0.04);
@@ -197,27 +239,6 @@ input[type="text"]:focus { border-color: var(--accent); }
   box-shadow: 0 0 16px rgba(255,79,123,0.12);
 }
 
-/* "You are" indicator for online game */
-.you-are {
-  font-family: 'Syne Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 1rem;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  color: var(--muted);
-}
-.you-are .symbol { font-size: 1.1rem; font-weight: 800; line-height: 1; }
-.you-are.is-x { border-color: rgba(232,255,71,0.4); color: var(--text); }
-.you-are.is-x .symbol { color: var(--accent); }
-.you-are.is-o { border-color: rgba(255,79,123,0.4); color: var(--text); }
-.you-are.is-o .symbol { color: var(--accent2); }
-
-/* Mini grid inside */
 .mini-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -246,7 +267,6 @@ input[type="text"]:focus { border-color: var(--accent); }
 .mini-cell:hover:not(.taken):not(.locked) { background: #2a2a3a; }
 .mini-cell.taken, .mini-cell.locked { cursor: default; }
 
-/* Won mini-board overlay */
 .mini-won-overlay {
   position: absolute;
   inset: 0;
@@ -259,27 +279,32 @@ input[type="text"]:focus { border-color: var(--accent); }
   border-radius: 4px;
   backdrop-filter: blur(1px);
 }
-.mini-won-overlay.x {
-  background: rgba(232,255,71,0.12);
-  color: var(--accent);
-  text-shadow: 0 0 30px rgba(232,255,71,0.6);
-}
-.mini-won-overlay.o {
-  background: rgba(255,79,123,0.12);
-  color: var(--accent2);
-  text-shadow: 0 0 30px rgba(255,79,123,0.6);
-}
-.mini-won-overlay.draw {
-  background: rgba(107,107,128,0.15);
-  color: var(--muted);
-  font-size: clamp(1rem, 4vw, 2rem);
-  letter-spacing: 0.1em;
-  font-family: 'Syne Mono', monospace;
-}
+.mini-won-overlay.x { background: rgba(232,255,71,0.12); color: var(--accent); text-shadow: 0 0 30px rgba(232,255,71,0.6); }
+.mini-won-overlay.o { background: rgba(255,79,123,0.12); color: var(--accent2); text-shadow: 0 0 30px rgba(255,79,123,0.6); }
+.mini-won-overlay.draw { background: rgba(107,107,128,0.15); color: var(--muted); font-size: clamp(1rem, 4vw, 2rem); letter-spacing: 0.1em; font-family: 'Syne Mono', monospace; }
 
-/* Winning mini-boards in big game */
 .mini-board-wrap.big-win-x { border-color: var(--accent) !important; box-shadow: 0 0 20px rgba(232,255,71,0.25); }
 .mini-board-wrap.big-win-o { border-color: var(--accent2) !important; box-shadow: 0 0 20px rgba(255,79,123,0.25); }
+
+/* "You are" indicator for online game */
+.you-are {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.you-are .symbol { font-size: 1.1rem; font-weight: 800; line-height: 1; }
+.you-are.is-x { border-color: rgba(232,255,71,0.4); color: var(--text); }
+.you-are.is-x .symbol { color: var(--accent); }
+.you-are.is-o { border-color: rgba(255,79,123,0.4); color: var(--text); }
+.you-are.is-o .symbol { color: var(--accent2); }
 </style>
 </head>
 <body>
@@ -290,7 +315,28 @@ input[type="text"]:focus { border-color: var(--accent); }
 <!-- HOME -->
 <div class="screen active" id="screen-home">
   <button class="btn primary" onclick="go('screen-local-game', startLocalGame)">Play Locally</button>
-  <button class="btn" onclick="go('screen-online-menu')">Play on the Internet</button>
+  <button class="btn" onclick="go('screen-online-menu')">Play Online</button>
+  <button class="btn" onclick="go('screen-difficulty')">Training vs Computer</button>
+</div>
+
+<!-- DIFFICULTY PICKER -->
+<div class="screen" id="screen-difficulty">
+  <div class="label" style="margin-bottom:0.5rem">Choose difficulty</div>
+  <div class="diff-buttons">
+    <button class="diff-btn easy"   onclick="startCpuGame('easy')">
+      <span class="diff-label">Easy</span>
+      <span class="diff-desc">Random moves</span>
+    </button>
+    <button class="diff-btn medium" onclick="startCpuGame('medium')">
+      <span class="diff-label">Medium</span>
+      <span class="diff-desc">Thinks ahead</span>
+    </button>
+    <button class="diff-btn hard"   onclick="startCpuGame('hard')">
+      <span class="diff-label">Hard</span>
+      <span class="diff-desc">Plays to win</span>
+    </button>
+  </div>
+  <button class="btn danger" onclick="go('screen-home')" style="margin-top:0.5rem">← Back</button>
 </div>
 
 <!-- ONLINE MENU -->
@@ -309,7 +355,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 <!-- WAITING ROOM -->
 <div class="screen" id="screen-waiting">
   <div class="label">Room Code</div>
-  <div class="code-display" id="waiting-code">XXXXX</div>
+  <div class="code-display" id="waiting-code">0000</div>
   <div class="label">Share this code with your opponent</div>
   <div class="spinner"></div>
   <div class="status">Waiting for opponent to join…</div>
@@ -328,6 +374,22 @@ input[type="text"]:focus { border-color: var(--accent); }
     <div class="btn-row">
       <button class="btn" onclick="startLocalGame()">New Game</button>
       <button class="btn danger" onclick="go('screen-home')">← Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- CPU GAME -->
+<div class="screen" id="screen-cpu-game">
+  <div class="game-wrap">
+    <div class="badges">
+      <span class="player-badge" id="cpu-badge-x">✕ You</span>
+      <span class="player-badge" id="cpu-badge-o">○ Computer</span>
+    </div>
+    <div class="super-board" id="cpu-super-board"></div>
+    <div class="status" id="cpu-status"></div>
+    <div class="btn-row">
+      <button class="btn" id="cpu-new-btn" onclick="restartCpuGame()">New Game</button>
+      <button class="btn danger" onclick="go('screen-difficulty')">← Difficulty</button>
     </div>
   </div>
 </div>
@@ -395,7 +457,16 @@ function freshGame() {
   };
 }
 
-// Apply a move locally (returns false if invalid)
+function cloneGame(g) {
+  return {
+    cells: g.cells.map(b => b.slice()),
+    miniWinner: g.miniWinner.slice(),
+    gameWinner: g.gameWinner,
+    turn: g.turn,
+    activeBoard: g.activeBoard
+  };
+}
+
 function applyMove(game, bi, ci) {
   if (game.gameWinner) return false;
   if (game.miniWinner[bi] !== null) return false;
@@ -408,9 +479,7 @@ function applyMove(game, bi, ci) {
   if (mw !== null) game.miniWinner[bi] = mw;
 
   const gw = checkBigWinner(game.miniWinner);
-  if (gw !== null) {
-    game.gameWinner = gw;
-  }
+  if (gw !== null) game.gameWinner = gw;
 
   if (!game.gameWinner) {
     game.activeBoard = (game.miniWinner[ci] !== null) ? null : ci;
@@ -419,27 +488,37 @@ function applyMove(game, bi, ci) {
   return true;
 }
 
+function getLegalMoves(game) {
+  if (game.gameWinner) return [];
+  const moves = [];
+  for (let bi = 0; bi < 9; bi++) {
+    if (game.miniWinner[bi] !== null) continue;
+    if (game.activeBoard !== null && game.activeBoard !== bi) continue;
+    for (let ci = 0; ci < 9; ci++) {
+      if (game.cells[bi][ci] === null) moves.push([bi, ci]);
+    }
+  }
+  return moves;
+}
+
 // ══════════════════════════════════════════════════════
 //  BOARD RENDERER
 // ══════════════════════════════════════════════════════
-function renderSuperBoard(boardEl, game, onCellClick) {
+function renderSuperBoard(boardEl, game, onCellClick, lockAll) {
   boardEl.innerHTML = '';
-
   for (let bi = 0; bi < 9; bi++) {
     const wrap = document.createElement('div');
     wrap.className = 'mini-board-wrap';
 
     const mw = game.miniWinner[bi];
-    const isTarget = !game.gameWinner && mw === null &&
+    const isTarget = !lockAll && !game.gameWinner && mw === null &&
                      (game.activeBoard === null || game.activeBoard === bi);
 
     if (isTarget) wrap.classList.add(game.turn === 0 ? 'target-x' : 'target-o');
 
-    // Big-win highlight for boards in a winning line
     if (mw !== null && mw !== 'draw') {
       const bigWin = checkBigWinner(game.miniWinner);
       if (bigWin !== null && bigWin !== 'draw') {
-        // highlight boards that are part of the winning line
         for (const [a,b,c] of WINS) {
           if (game.miniWinner[a] === bigWin && game.miniWinner[b] === bigWin && game.miniWinner[c] === bigWin) {
             if (bi === a || bi === b || bi === c) {
@@ -450,7 +529,6 @@ function renderSuperBoard(boardEl, game, onCellClick) {
       }
     }
 
-    // Mini grid
     const miniEl = document.createElement('div');
     miniEl.className = 'mini-board';
 
@@ -462,16 +540,14 @@ function renderSuperBoard(boardEl, game, onCellClick) {
       else if (val === 1) { cell.classList.add('o', 'taken'); cell.textContent = '○'; }
       else if (mw !== null) { cell.classList.add('locked'); }
 
-      if (val === null && mw === null) {
+      if (val === null && mw === null && !lockAll) {
         cell.onclick = () => onCellClick(bi, ci);
       }
-
       miniEl.appendChild(cell);
     }
 
     wrap.appendChild(miniEl);
 
-    // Won overlay
     if (mw !== null) {
       const ov = document.createElement('div');
       ov.className = 'mini-won-overlay';
@@ -488,11 +564,9 @@ function renderSuperBoard(boardEl, game, onCellClick) {
 // ══════════════════════════════════════════════════════
 //  STATUS HELPERS
 // ══════════════════════════════════════════════════════
-function gameStatusHTML(game, myIndex /* undefined for local */) {
+function gameStatusHTML(game, myIndex) {
   const isLocal = myIndex === undefined;
-
   if (game.gameWinner === 'draw') return "It's a draw!";
-
   if (game.gameWinner !== null) {
     const winner = game.gameWinner;
     if (isLocal) {
@@ -503,13 +577,10 @@ function gameStatusHTML(game, myIndex /* undefined for local */) {
       return `<span class="${winner === 0 ? 'hx' : 'ho'}">${iWon ? 'You win! 🎉' : 'Opponent wins.'}</span>`;
     }
   }
-
-  // Game ongoing
   const isFree = game.activeBoard === null;
   const turnLabel = game.turn === 0
     ? `<span class="hx">${isLocal ? 'Player 1' : (game.turn === myIndex ? 'You' : 'Opponent')}</span>`
     : `<span class="ho">${isLocal ? 'Player 2' : (game.turn === myIndex ? 'You' : 'Opponent')}</span>`;
-
   const suffix = isFree ? ' — pick any board' : '';
   return `${turnLabel}'s turn${suffix}`;
 }
@@ -538,11 +609,219 @@ function renderLocal() {
     renderLocal();
   });
   document.getElementById('local-status').innerHTML = gameStatusHTML(localGame);
-  updateBadges(
-    document.getElementById('local-badge-x'),
-    document.getElementById('local-badge-o'),
-    localGame
-  );
+  updateBadges(document.getElementById('local-badge-x'), document.getElementById('local-badge-o'), localGame);
+}
+
+// ══════════════════════════════════════════════════════
+//  AI ENGINE
+// ══════════════════════════════════════════════════════
+const CPU_SIDE = 1; // computer always plays O
+const HUMAN_SIDE = 0;
+
+// ── Heuristic evaluation ──────────────────────────────
+// Score the position from CPU's perspective (positive = good for CPU)
+function evaluate(game) {
+  if (game.gameWinner === CPU_SIDE) return 100000;
+  if (game.gameWinner === HUMAN_SIDE) return -100000;
+  if (game.gameWinner === 'draw') return 0;
+
+  let score = 0;
+
+  // Score the macro board (mini-board winners)
+  score += scoreLine(game.miniWinner, CPU_SIDE) * 100;
+  score -= scoreLine(game.miniWinner, HUMAN_SIDE) * 100;
+
+  // Score each individual mini-board's internal state
+  for (let bi = 0; bi < 9; bi++) {
+    if (game.miniWinner[bi] !== null) continue;
+    const miniScore = scoreLine(game.cells[bi], CPU_SIDE) - scoreLine(game.cells[bi], HUMAN_SIDE);
+    // Weight center and corner mini-boards slightly higher
+    const posWeight = [1.2, 1.0, 1.2, 1.0, 1.5, 1.0, 1.2, 1.0, 1.2][bi];
+    score += miniScore * posWeight;
+  }
+
+  // Small bonus for center cell of each mini-board
+  for (let bi = 0; bi < 9; bi++) {
+    if (game.miniWinner[bi] !== null) continue;
+    if (game.cells[bi][4] === CPU_SIDE) score += 3;
+    if (game.cells[bi][4] === HUMAN_SIDE) score -= 3;
+  }
+
+  return score;
+}
+
+// Count two-in-a-row threats for `side` in a 9-cell line (board or miniWinner array)
+function scoreLine(line, side) {
+  let score = 0;
+  for (const [a,b,c] of WINS) {
+    const vals = [line[a], line[b], line[c]];
+    const mine = vals.filter(v => v === side).length;
+    const empty = vals.filter(v => v === null).length;
+    const opponent = vals.filter(v => v !== null && v !== side && v !== 'draw').length;
+    if (opponent === 0) {
+      if (mine === 3) score += 1000;
+      else if (mine === 2 && empty === 1) score += 10;
+      else if (mine === 1 && empty === 2) score += 1;
+    }
+  }
+  return score;
+}
+
+// ── Minimax with alpha-beta pruning ───────────────────
+function minimax(game, depth, alpha, beta, maximizing) {
+  if (game.gameWinner !== null || depth === 0) return evaluate(game);
+
+  const moves = getLegalMoves(game);
+  if (moves.length === 0) return evaluate(game);
+
+  if (maximizing) {
+    let best = -Infinity;
+    for (const [bi, ci] of moves) {
+      const g2 = cloneGame(game);
+      applyMove(g2, bi, ci);
+      best = Math.max(best, minimax(g2, depth - 1, alpha, beta, false));
+      alpha = Math.max(alpha, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (const [bi, ci] of moves) {
+      const g2 = cloneGame(game);
+      applyMove(g2, bi, ci);
+      best = Math.min(best, minimax(g2, depth - 1, alpha, beta, true));
+      beta = Math.min(beta, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  }
+}
+
+// ── Move selectors per difficulty ─────────────────────
+function cpuMoveEasy(game) {
+  const moves = getLegalMoves(game);
+  return moves[Math.floor(Math.random() * moves.length)];
+}
+
+function cpuMoveMedium(game) {
+  const moves = getLegalMoves(game);
+  if (moves.length === 0) return null;
+
+  // Shuffle for variety
+  for (let i = moves.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [moves[i], moves[j]] = [moves[j], moves[i]];
+  }
+
+  let bestScore = -Infinity;
+  let bestMove = moves[0];
+  // Depth 3 — fast, plays sensibly
+  for (const [bi, ci] of moves) {
+    const g2 = cloneGame(game);
+    applyMove(g2, bi, ci);
+    const score = minimax(g2, 3, -Infinity, Infinity, false);
+    if (score > bestScore) { bestScore = score; bestMove = [bi, ci]; }
+  }
+  return bestMove;
+}
+
+function cpuMoveHard(game) {
+  const moves = getLegalMoves(game);
+  if (moves.length === 0) return null;
+
+  // Shuffle for variety on equal-score moves
+  for (let i = moves.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [moves[i], moves[j]] = [moves[j], moves[i]];
+  }
+
+  // Reduce depth when branching factor is very high (free choice = up to 81 moves)
+  const depth = game.activeBoard === null ? 4 : 5;
+
+  let bestScore = -Infinity;
+  let bestMove = moves[0];
+  let alpha = -Infinity;
+  for (const [bi, ci] of moves) {
+    const g2 = cloneGame(game);
+    applyMove(g2, bi, ci);
+    const score = minimax(g2, depth - 1, alpha, Infinity, false);
+    if (score > bestScore) { bestScore = score; bestMove = [bi, ci]; alpha = score; }
+  }
+  return bestMove;
+}
+
+// ── Dispatch ──────────────────────────────────────────
+function cpuPickMove(game, difficulty) {
+  if (difficulty === 'easy')   return cpuMoveEasy(game);
+  if (difficulty === 'medium') return cpuMoveMedium(game);
+  return cpuMoveHard(game);
+}
+
+// ══════════════════════════════════════════════════════
+//  CPU GAME
+// ══════════════════════════════════════════════════════
+let cpuGame, cpuDifficulty, cpuThinking, cpuGeneration = 0;
+
+function startCpuGame(difficulty) {
+  cpuDifficulty = difficulty;
+  cpuGame = freshGame();
+  cpuThinking = false;
+  cpuGeneration++;
+  go('screen-cpu-game');
+  renderCpu();
+}
+
+function restartCpuGame() {
+  startCpuGame(cpuDifficulty);
+}
+
+function renderCpu() {
+  const boardEl = document.getElementById('cpu-super-board');
+  const isHumanTurn = cpuGame.turn === HUMAN_SIDE && !cpuGame.gameWinner && !cpuThinking;
+
+  renderSuperBoard(boardEl, cpuGame, (bi, ci) => {
+    if (cpuThinking || cpuGame.turn !== HUMAN_SIDE || cpuGame.gameWinner) return;
+    applyMove(cpuGame, bi, ci);
+    renderCpu();
+    if (!cpuGame.gameWinner) scheduleCpuMove();
+  }, !isHumanTurn /* lockAll when it's not human's turn */);
+
+  const statusEl = document.getElementById('cpu-status');
+
+  if (cpuGame.gameWinner !== null) {
+    if (cpuGame.gameWinner === 'draw') {
+      statusEl.innerHTML = "It's a draw!";
+    } else if (cpuGame.gameWinner === HUMAN_SIDE) {
+      statusEl.innerHTML = '<span class="hx">You win! 🎉</span>';
+    } else {
+      statusEl.innerHTML = '<span class="ho">Computer wins.</span>';
+    }
+  } else if (cpuThinking) {
+    statusEl.innerHTML = '<span class="ho thinking">Computer is thinking</span>';
+  } else {
+    const isFree = cpuGame.activeBoard === null;
+    statusEl.innerHTML = '<span class="hx">Your turn' + (isFree ? ' — pick any board' : '') + '</span>';
+  }
+
+  updateBadges(document.getElementById('cpu-badge-x'), document.getElementById('cpu-badge-o'), cpuGame);
+}
+
+function scheduleCpuMove() {
+  cpuThinking = true;
+  renderCpu(); // show "thinking" immediately
+
+  const gen = cpuGeneration;
+  // Small delay so the UI updates and thinking animation shows
+  setTimeout(() => {
+    if (gen !== cpuGeneration) return; // new game started, discard
+    const move = cpuPickMove(cpuGame, cpuDifficulty);
+    if (gen !== cpuGeneration) return; // check again after computation
+    if (move) {
+      applyMove(cpuGame, move[0], move[1]);
+    }
+    cpuThinking = false;
+    renderCpu();
+  }, cpuDifficulty === 'easy' ? 300 : cpuDifficulty === 'medium' ? 500 : 600);
 }
 
 // ══════════════════════════════════════════════════════
@@ -625,10 +904,7 @@ function handleMsg(msg) {
     setOnlineStatus('Waiting for opponent…');
   }
   else if (msg.type === 'opponent_left') {
-    // Game is paused, room held for 5 min — show the room code so someone can rejoin
-    const code = ws && ws._code ? ws._code : '';
     setOnlineStatus('Opponent disconnected. Room held for 5 min — share code <span class="hx">' + currentRoomCode + '</span> to let them rejoin.');
-    // Don't set onlineOver — game can resume
     document.getElementById('online-btn-row').style.display = 'none';
     document.getElementById('online-leave-btn').style.display = 'block';
   }
@@ -641,16 +917,10 @@ function initOnlineUI() {
   const bo = document.getElementById('online-badge-o');
   if (myIndex === 0) { bx.textContent = '✕ You'; bo.textContent = '○ Opponent'; }
   else { bx.textContent = '✕ Opponent'; bo.textContent = '○ You'; }
-  // Set "You are" indicator
   const youAre = document.getElementById('online-you-are');
   const youSym = document.getElementById('online-you-symbol');
-  if (myIndex === 0) {
-    youAre.className = 'you-are is-x';
-    youSym.textContent = '✕';
-  } else {
-    youAre.className = 'you-are is-o';
-    youSym.textContent = '○';
-  }
+  if (myIndex === 0) { youAre.className = 'you-are is-x'; youSym.textContent = '✕'; }
+  else { youAre.className = 'you-are is-o'; youSym.textContent = '○'; }
 }
 
 function renderOnline() {
@@ -661,11 +931,7 @@ function renderOnline() {
     ws.send(JSON.stringify({ type: 'move', bi, ci }));
   });
   setOnlineStatus(gameStatusHTML(onlineGame, myIndex));
-  updateBadges(
-    document.getElementById('online-badge-x'),
-    document.getElementById('online-badge-o'),
-    onlineGame
-  );
+  updateBadges(document.getElementById('online-badge-x'), document.getElementById('online-badge-o'), onlineGame);
 }
 
 function setOnlineStatus(html) {
