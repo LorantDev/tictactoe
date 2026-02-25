@@ -7,10 +7,8 @@ const PORT = process.env.PORT || 3000;
 const rooms = {};
 
 function generateCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
+  // 4-digit numeric code, zero-padded
+  return String(Math.floor(Math.random() * 10000)).padStart(4, '0');
 }
 
 // ─── Super TTT Logic ──────────────────────────────────────────────
@@ -97,22 +95,42 @@ wss.on('connection', (ws) => {
     if (msg.type === 'create') {
       let code;
       do { code = generateCode(); } while (rooms[code]);
-      rooms[code] = { players: [ws], game: freshGame() };
+      rooms[code] = { players: [ws, null], game: freshGame(), holdTimer: null };
       ws.roomCode = code;
       ws.playerIndex = 0;
       ws.send(JSON.stringify({ type: 'created', code }));
     }
 
     else if (msg.type === 'join') {
-      const code = (msg.code || '').toUpperCase().trim();
+      const code = (msg.code || '').trim();
       const room = rooms[code];
       if (!room) { ws.send(JSON.stringify({ type: 'error', msg: 'Room not found.' })); return; }
-      if (room.players.length >= 2) { ws.send(JSON.stringify({ type: 'error', msg: 'Room is full.' })); return; }
-      room.players.push(ws);
+
+      // Find a vacant slot (null or disconnected)
+      let slot = -1;
+      for (let i = 0; i < 2; i++) {
+        const p = room.players[i];
+        if (p === null || p.readyState === 3 /* CLOSED */) { slot = i; break; }
+      }
+      if (slot === -1) { ws.send(JSON.stringify({ type: 'error', msg: 'Room is full.' })); return; }
+
+      // Cancel hold timer if running
+      if (room.holdTimer) { clearTimeout(room.holdTimer); room.holdTimer = null; }
+
+      room.players[slot] = ws;
       ws.roomCode = code;
-      ws.playerIndex = 1;
-      ws.send(JSON.stringify({ type: 'joined', code }));
-      broadcast(room, { type: 'start', game: room.game });
+      ws.playerIndex = slot;
+
+      const isResume = room.game.cells.some(b => b.some(c => c !== null));
+      ws.send(JSON.stringify({ type: 'joined', code, playerIndex: slot }));
+
+      if (isResume) {
+        // Game already in progress — tell everyone to resume
+        broadcast(room, { type: 'start', game: room.game });
+      } else if (room.players.filter(p => p && p.readyState === 1).length === 2) {
+        // Fresh game, both players now present
+        broadcast(room, { type: 'start', game: room.game });
+      }
     }
 
     else if (msg.type === 'move') {
@@ -139,10 +157,28 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    const room = rooms[ws.roomCode];
+    const code = ws.roomCode;
+    const room = rooms[code];
     if (!room) return;
+
+    // Mark slot as closed
+    const idx = room.players.indexOf(ws);
+    if (idx !== -1) room.players[idx] = null;
+
+    // If no players left at all, delete immediately
+    const anyAlive = room.players.some(p => p && p.readyState === 1);
+    if (!anyAlive && room.players.every(p => p === null)) {
+      delete rooms[code];
+      return;
+    }
+
+    // Notify remaining player and hold room for 5 minutes
     broadcast(room, { type: 'opponent_left' });
-    delete rooms[ws.roomCode];
+    if (room.holdTimer) clearTimeout(room.holdTimer);
+    room.holdTimer = setTimeout(() => {
+      delete rooms[code];
+      console.log('Room', code, 'expired after 5 min hold');
+    }, 5 * 60 * 1000);
   });
 });
 
